@@ -1,5 +1,7 @@
 # Go Web Adventure
 
+<img width="1584" height="606" alt="image" src="https://github.com/user-attachments/assets/f6350392-f027-4ecc-96d3-14dc867e90e5" />
+
 ## Giới thiệu
 
 **Go Web Adventure** là một trò chơi phiêu lưu văn bản đơn giản được xây dựng bằng Go, sử dụng các khái niệm cơ bản về web server (`net/http`), HTML, CSS và JavaScript. Dự án này minh họa cách sử dụng hai cấu trúc dữ liệu quan trọng nhất trong Go là **Slice** và **Map** để quản lý trạng thái trò chơi, bao gồm thế giới game, các phòng, vật phẩm và hành trang của người chơi.
