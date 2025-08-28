@@ -1,0 +1,7 @@
+Alice,8,7,9
+Bob,4,6,5
+Charlie,9,9,10,8
+David,3,2
+Eve,7,8,7,9,6
+InvalidStudent,abc,7,8
+AnotherStudent,10,9,invalid_grade,8
