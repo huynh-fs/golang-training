@@ -9,3 +9,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 2. [Cấu trúc dự án](./project-structure/README.md)
 3. [Cú pháp cơ bản](./basic-syntax/README.md)
 4. [Slice & Map](./slice-map/README.md)
+5. [Vòng lặp](./loop/README.md)
+6. [Các mệnh đề điều kiện](./conditional-clauses/README.md)
