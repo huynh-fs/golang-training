@@ -74,6 +74,11 @@ Khi chạy, chương trình sẽ thực hiện các bước sau:
     -   `func AddStock(p *models.Product, ...)`: Tham số `p` là một con trỏ. Bất kỳ thay đổi nào trên `p.Quantity` đều ảnh hưởng đến biến gốc.
     -   `func TryToUpdateNameByValue(p models.Product, ...)`: Tham số `p` là một giá trị (bản sao). Thay đổi trên `p.Name` chỉ có tác dụng cục bộ bên trong hàm.
 
+## Kết quả đạt được
+
+<img width="862" height="796" alt="image" src="https://github.com/user-attachments/assets/40ce6478-c20a-4547-a9f6-a78f20d7a32e" />
+
+
 ## Kết luận
 
 Dự án này là một bài thực hành nhỏ gọn nhưng hiệu quả để hiểu rõ một trong những khái niệm quan trọng và mạnh mẽ nhất của Go. Nắm vững con trỏ là chìa khóa để viết code hiệu quả, tối ưu và có khả năng sửa đổi trạng thái của chương trình một cách tường minh.
