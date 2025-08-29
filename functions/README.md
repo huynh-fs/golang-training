@@ -63,3 +63,5 @@ functions/
 ### Output dự kiến
 
 Bạn sẽ thấy một loạt các thông báo log và kết quả tính toán được in ra console, minh họa từng khái niệm về hàm.
+
+<img width="821" height="749" alt="image" src="https://github.com/user-attachments/assets/aba17f91-6e73-421f-9ad4-ce1505ebf811" />
