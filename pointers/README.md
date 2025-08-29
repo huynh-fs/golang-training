@@ -1,4 +1,4 @@
-# Go: Demo về Con trỏ và Cấu trúc Dự án
+# Go: Demo về Con trỏ
 
 Dự án này là một ví dụ đơn giản được viết bằng Go để minh họa các khái niệm cốt lõi về **con trỏ (pointers)**, sự khác biệt giữa **truyền tham trị (pass-by-value)** và cách dùng con trỏ để mô phỏng **truyền tham chiếu (pass-by-reference)**.
 
@@ -18,8 +18,6 @@ Tất cả được đặt trong một cấu trúc thư mục rõ ràng, phân t
     *   Cách truyền một con trỏ (địa chỉ bộ nhớ) vào hàm.
     *   Làm thế nào hàm có thể sử dụng con trỏ đó để sửa đổi giá trị của biến gốc, một kỹ thuật cần thiết cho nhiều tác vụ.
 
-4.  **Cấu trúc dự án cơ bản**:
-    *   Phân tách `models` (định nghĩa dữ liệu), `services` (logic nghiệp vụ), và `main` (điểm khởi chạy ứng dụng) để mã nguồn dễ đọc, dễ bảo trì hơn.
 
 ## Cấu trúc thư mục
 
