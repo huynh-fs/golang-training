@@ -11,3 +11,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 4. [Slice & Map](./slice-map/README.md)
 5. [Vòng lặp](./loop/README.md)
 6. [Các mệnh đề điều kiện](./conditions/README.md)
+7. [Hàm](./functions/README.md)
+8. [Con trỏ (Pointers)](./pointers/README.md)
