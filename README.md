@@ -13,3 +13,4 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 6. [Các mệnh đề điều kiện](./conditions/README.md)
 7. [Hàm](./functions/README.md)
 8. [Con trỏ (Pointers)](./pointers/README.md)
+9. [Struct](./struct/README.md)
