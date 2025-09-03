@@ -1,48 +1,14 @@
-package main
+package cli
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
+	"github.com/huynh-fs/struct/internal/models"
 )
 
-type Classes struct {
-	Name          	string
-	numOfStudents 	int
-}
-
-type Students struct {
-	Name      string
-	Class     *Classes
-}
-
-func main() {
-	var classes []Classes
-	var students []Students
-
-	for {
-		printMenu()
-		luaChon := inputChoice()
-
-		switch luaChon {
-		case "1":
-			classes = inputClassesInfo(classes)
-		case "2":
-			students = inputStudentInfo(classes, students)
-		case "3":
-			displayInfo(classes, students)
-		case "4":
-			fmt.Println("Tạm biệt!")
-			return 
-		default:
-			fmt.Println("Lựa chọn không hợp lệ. Vui lòng nhập một số từ 1 đến 4.")
-		}
-		fmt.Println()
-	}
-}
-
-func printMenu() {
+func PrintMenu() {
 	fmt.Println("===== MENU HỆ THỐNG QUẢN LÝ =====")
 	fmt.Println("1. Thêm Lớp Học Mới")
 	fmt.Println("2. Thêm Học Sinh Mới")
@@ -51,13 +17,13 @@ func printMenu() {
 	fmt.Print("Nhập lựa chọn của bạn: ")
 }
 
-func inputChoice() string {
+func InputChoice() string {
 	reader := bufio.NewReader(os.Stdin)
 	luaChon, _ := reader.ReadString('\n')
 	return strings.TrimSpace(luaChon)
 }
 
-func inputClassesInfo(currentClasses []Classes) []Classes {
+func InputClassesInfo(currentClasses []models.Classes) []models.Classes {
 	classes := currentClasses
 	reader := bufio.NewReader(os.Stdin)
 
@@ -85,7 +51,7 @@ func inputClassesInfo(currentClasses []Classes) []Classes {
 			continue
 		}
 
-		class := Classes{Name: name, numOfStudents: 0}
+		class := models.Classes{Name: name, NumOfStudents: 0}
 		classes = append(classes, class)
 		fmt.Printf("Đã thêm thành công lớp học: %s\n", name)
 	}
@@ -93,7 +59,7 @@ func inputClassesInfo(currentClasses []Classes) []Classes {
 	return classes
 }
 
-func inputStudentInfo(classes []Classes, currentStudent []Students) []Students {
+func InputStudentInfo(classes []models.Classes, currentStudent []models.Students) []models.Students {
 	if len(classes) == 0 {
 		fmt.Println("Lỗi: Chưa có lớp học nào. Vui lòng thêm lớp học trước khi thêm sinh viên.")
 		return currentStudent
@@ -113,7 +79,7 @@ func inputStudentInfo(classes []Classes, currentStudent []Students) []Students {
 			break
 		}
 
-		var pClass *Classes
+		var pClass *models.Classes
 		for {
 			fmt.Print("Nhập tên lớp học của sinh viên: ")
 			className, _ := reader.ReadString('\n')
@@ -138,15 +104,15 @@ func inputStudentInfo(classes []Classes, currentStudent []Students) []Students {
 			}
 		}
 
-		student := Students{Name: name, Class: pClass}
+		student := models.Students{Name: name, Class: pClass}
 		students = append(students, student)
 	}
 
 	return students
 }
 
-func displayInfo(classes []Classes, students []Students) {
-	studentGroupByClass := make(map[*Classes][]Students)
+func DisplayInfo(classes []models.Classes, students []models.Students) {
+	studentGroupByClass := make(map[*models.Classes][]models.Students)
 	if len(classes) == 0 {
 		fmt.Println("Chưa có lớp học nào để hiển thị.")
 		return
@@ -159,10 +125,10 @@ func displayInfo(classes []Classes, students []Students) {
 		class := &classes[i]
 		
 		studentsInClass := studentGroupByClass[class]
-		class.numOfStudents = len(studentsInClass)
+		class.NumOfStudents = len(studentsInClass)
 
-		fmt.Printf("-----Lớp: %s | Số lượng sinh viên: %d -----\n", class.Name, class.numOfStudents)
-		if class.numOfStudents == 0 {
+		fmt.Printf("-----Lớp: %s | Số lượng sinh viên: %d -----\n", class.Name, class.NumOfStudents)
+		if class.NumOfStudents == 0 {
 			fmt.Println("Lớp chưa có sinh viên nào.")
 		} else {
 			for i, student := range studentsInClass {
