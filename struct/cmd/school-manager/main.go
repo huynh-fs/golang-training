@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	classService := service.NewClassService()
-	cliHandler := handler.NewCLIHandler(classService)
+	schoolService := service.NewSchoolService()
+	cliHandler := handler.NewCLIHandler(schoolService)
 	cliHandler.Run()
 }
 
