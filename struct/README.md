@@ -1,64 +1,62 @@
 # Hệ thống Quản lý Lớp học và Học sinh (CLI)
 
-Đây là một ứng dụng dòng lệnh (CLI - Command-Line Interface) được xây dựng bằng ngôn ngữ Go. Dự án này không chỉ là một công cụ quản lý đơn giản mà còn là một ví dụ điển hình về cách cấu trúc một dự án Go theo layout chuẩn mực, thể hiện rõ ràng việc tách biệt các thành phần (separation of concerns).
+Đây là một ứng dụng dòng lệnh (CLI - Command-Line Interface) được xây dựng bằng ngôn ngữ Go. Dự án này là một ví dụ thực hành về việc áp dụng **Kiến trúc Phân lớp (Layered Architecture)** vào một ứng dụng Go, thể hiện rõ ràng việc phân tách trách nhiệm (Separation of Concerns) giữa các thành phần khác nhau của hệ thống.
 
-Ứng dụng này là một tài liệu tham khảo tuyệt vời cho các lập trình viên Go muốn xây dựng các ứng dụng có khả năng bảo trì và mở rộng tốt.
+Mục tiêu chính không chỉ là giải quyết bài toán quản lý lớp học, mà còn là để minh họa một cấu trúc dự án có khả năng bảo trì, mở rộng và kiểm thử tốt, sẵn sàng cho các yêu cầu phức tạp trong tương lai.
 
-## Tính năng
+## Kiến trúc
 
-- **Thêm Lớp học Mới**: Cho phép người dùng thêm nhiều lớp học vào hệ thống.
-- **Thêm Học sinh Mới**: Cho phép thêm học sinh và liên kết học sinh đó với một lớp học đã tồn tại.
-- **Hiển thị Báo cáo Chi tiết**: In ra danh sách tất cả các lớp, tự động cập nhật sĩ số, và liệt kê danh sách học sinh có trong từng lớp.
-- **Giao diện Menu Tương tác**: Cung cấp một menu đơn giản, dễ sử dụng để người dùng lựa chọn các chức năng.
-- **Xác thực Dữ liệu (Data Validation)**: Chương trình tự động kiểm tra và **ngăn chặn** việc tạo các lớp học có tên trùng nhau, đảm bảo dữ liệu luôn nhất quán.
+Dự án được cấu trúc theo mô hình Kiến trúc Phân lớp, bao gồm 3 tầng chính:
+
+1.  **Domain Layer (Tầng Miền)**: Lớp trong cùng, chứa định nghĩa về các đối tượng nghiệp vụ cốt lõi (`Classes`, `Students`) và các hành vi (methods) gắn liền với chúng. Tầng này không phụ thuộc vào bất kỳ tầng nào khác.
+2.  **Service Layer (Tầng Dịch vụ/Nghiệp vụ)**: Chứa logic nghiệp vụ của ứng dụng. Nó điều phối các đối tượng `Domain` để thực hiện các tác vụ được yêu cầu từ tầng bên ngoài. Tầng này không biết về cách dữ liệu được trình bày (CLI, HTTP, etc.).
+3.  **Handler Layer (Tầng Xử lý/Giao tiếp)**: Lớp ngoài cùng, chịu trách nhiệm tương tác với "thế giới bên ngoài". Trong dự án này, nó là một `CLI Handler` xử lý input/output từ console. Tầng này nhận yêu cầu, gọi đến `Service` tương ứng, và trình bày kết quả cho người dùng.
+
+Luồng điều khiển (Control Flow) của ứng dụng đi theo một hướng duy nhất:
+`main` -> `Handler Layer` -> `Service Layer` -> `Domain Layer`
 
 ## Cấu trúc Thư mục
 
-Dự án được tổ chức theo một cấu trúc thư mục rõ ràng và được khuyến nghị trong cộng đồng Go:
-
 ```
-school-manager/
+struct/
 ├── cmd/
 │   └── school-manager/
-│       └── main.go         # Điểm khởi đầu (entrypoint) của ứng dụng
+│       └── main.go              # Điểm khởi đầu. Khởi tạo và "tiêm" các phụ thuộc.
 ├── internal/
-│   ├── cli/
-│   │   └── handler.go      # Chứa logic nghiệp vụ và tương tác người dùng
-│   └── models/
-│       └── models.go       # Định nghĩa các struct dữ liệu (Classes, Students)
-├── go.mod                  # File quản lý module của Go
-└── README.md               # Tài liệu hướng dẫn
+│   ├── app/
+│   │   └── school-manager/
+│   │       ├── handler/
+│   │       │   └── cli_handler.go # Tầng Giao tiếp: Tương tác với console.
+│   │       └── service/
+│   │           └── class_service.go # Tầng Nghiệp vụ: Chứa business logic.
+│   └── domain/
+│       ├── class.go             # Tầng Miền: Định nghĩa struct Classes và methods.
+│       └── student.go           # Tầng Miền: Định nghĩa struct Students.
+└── go.mod
 ```
 
-- **`cmd/school-manager/main.go`**: Đây là điểm khởi đầu duy nhất của chương trình. Nhiệm vụ chính của nó là khởi tạo các biến dữ liệu và gọi các hàm xử lý từ package `cli` trong một vòng lặp menu.
-- **`internal/models/`**: Package này chứa định nghĩa cho các cấu trúc dữ liệu cốt lõi của ứng dụng (`Classes`, `Students`). Việc tách riêng models giúp dữ liệu trở nên độc lập và dễ dàng tái sử dụng.
-- **`internal/cli/`**: Chứa toàn bộ logic nghiệp vụ, bao gồm việc hiển thị menu, nhận và xử lý input từ người dùng, và in kết quả ra màn hình.
-- **`go.mod`**: File định nghĩa module Go, quản lý các dependency của dự án.
+-   **`/cmd`**: Chứa điểm khởi đầu (entrypoint) của ứng dụng. Vai trò của `main.go` ở đây là thiết lập và kết nối các tầng lại với nhau (Dependency Injection).
+-   **`/internal/domain`**: Định nghĩa các thực thể cốt lõi của bài toán.
+-   **`/internal/app/school-manager/service`**: Thực thi các quy trình nghiệp vụ. Ví dụ: logic kiểm tra lớp tồn tại, logic thêm học sinh vào lớp.
+-   **`/internal/app/school-manager/handler`**: Cầu nối giữa người dùng và ứng dụng. Nó dịch các lệnh từ console thành các lời gọi đến `service`.
 
-## Các Khái niệm Kỹ thuật Nổi bật
+## Lợi ích của Kiến trúc này
 
-- **Tổ chức Package (Package Organization)**: Dự án thể hiện rõ cách chia nhỏ code thành các package có trách nhiệm riêng biệt (`models` cho dữ liệu, `cli` cho logic), giúp code dễ đọc và bảo trì.
-- **Struct và Con trỏ**: Mối quan hệ giữa Học sinh và Lớp học được định nghĩa chặt chẽ bằng một con trỏ (`*Classes`) trong struct `Students`, đảm bảo tính toàn vẹn dữ liệu.
-- **Toàn vẹn Dữ liệu (Data Integrity)**: Bằng cách kiểm tra trùng lặp tên lớp ngay tại khâu nhập liệu, chương trình đảm bảo mỗi lớp học là một thực thể duy nhất.
-- **Slices và Maps**: Sử dụng slice như một cơ sở dữ liệu trong bộ nhớ và map để nhóm dữ liệu một cách hiệu quả khi hiển thị báo cáo.
+-   **Phân tách Trách nhiệm Rõ ràng**: Mỗi tầng có một nhiệm vụ duy nhất, giúp code dễ hiểu và dễ quản lý.
+-   **Khả năng Kiểm thử (Testability)**: Tầng `service` và `domain` có thể được kiểm thử (unit test) một cách độc lập mà không cần đến giao diện người dùng, giúp đảm bảo logic nghiệp vụ luôn chính xác.
+-   **Khả năng Thay thế và Mở rộng**: Nếu trong tương lai muốn chuyển từ CLI sang một giao diện Web API, chúng ta chỉ cần tạo một `http_handler` mới và cho nó gọi đến cùng `ClassService` đã có. Toàn bộ logic nghiệp vụ ở tầng `service` và `domain` được **tái sử dụng hoàn toàn**.
 
 ## Cài đặt và Chạy chương trình
 
 ### Yêu cầu
-
-- Cần cài đặt **Go** (phiên bản 1.18 trở lên). Bạn có thể tải về tại [https://go.dev/dl/](https://go.dev/dl/).
+-   Cần cài đặt **Go** (phiên bản 1.18 trở lên). Bạn có thể tải về tại [https://go.dev/dl/](https://go.dev/dl/).
 
 ### Hướng dẫn
-
 1.  Clone hoặc tải về toàn bộ thư mục dự án này.
 2.  Mở terminal (Command Prompt, PowerShell, hoặc Terminal trên Linux/macOS).
 3.  Sử dụng lệnh `cd` để di chuyển vào thư mục gốc của dự án (`school-manager`).
 4.  Chạy ứng dụng bằng lệnh sau:
-
     ```sh
     go run ./cmd/school-manager
     ```
-
-    **Lưu ý:** Lệnh này chỉ cho Go biết điểm khởi đầu của ứng dụng nằm ở đâu, sau đó Go sẽ tự động biên dịch tất cả các package liên quan trong `internal`.
-
 5.  Chương trình sẽ khởi động và hiển thị menu để bạn bắt đầu tương tác.
