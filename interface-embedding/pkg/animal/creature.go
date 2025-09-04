@@ -1,4 +1,4 @@
-package domain
+package animal
 
 type Creature interface {
 	GetName() string

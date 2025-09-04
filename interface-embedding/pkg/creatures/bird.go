@@ -1,19 +1,12 @@
 package creatures
-
 type Bird struct {
-	animal
+	baseAnimal
 }
 
-func (b Bird) Speak() string {
-	return "Chíp chíp!"
-}
-
-func (b Bird) Move() string {
-	return "Bay bằng đôi cánh"
-}
+func (d *Bird) GetName() string { return d.Name }
+func (d *Bird) Speak() string   { return "Chíp chíp!" }
+func (d *Bird) Move() string    { return "Bay bằng đôi cánh" }
 
 func NewBird(name string, age int) Bird {
-	return Bird{
-		animal: animal{Name: name, Age: age},
-	}
+	return Bird{baseAnimal: baseAnimal{Name: name, Age: age}}
 }
