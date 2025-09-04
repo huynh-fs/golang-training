@@ -9,12 +9,12 @@ import (
 )
 
 type CLIHandler struct {
-	classService *service.ClassService 
+	schoolService *service.SchoolService
 }
 
-func NewCLIHandler(cs *service.ClassService) *CLIHandler {
+func NewCLIHandler(schoolService *service.SchoolService) *CLIHandler {
 	return &CLIHandler{
-		classService: cs,
+		schoolService: schoolService,
 	}
 }
 
@@ -47,7 +47,7 @@ func (h *CLIHandler) handleAddClass() {
 	name, _ := reader.ReadString('\n')
 	name = strings.TrimSpace(name)
 
-	if err := h.classService.CreateClass(name); err != nil {
+	if err := h.schoolService.CreateClass(name); err != nil {
 		fmt.Printf("Lỗi: %v\n", err)
 	} else {
 		fmt.Printf("-> Đã thêm thành công lớp '%s'.\n", name)
@@ -65,7 +65,7 @@ func (h *CLIHandler) handleAddStudent() {
 	className, _ := reader.ReadString('\n')
 	className = strings.TrimSpace(className)
 
-	if err := h.classService.AddStudentToClass(studentName, className); err != nil {
+	if err := h.schoolService.AddStudent(studentName, className); err != nil {
 		fmt.Printf("Lỗi: %v\n", err)
 	} else {
 		fmt.Printf("-> Đã thêm thành công học sinh '%s' vào lớp '%s'.\n", studentName, className)
@@ -73,14 +73,26 @@ func (h *CLIHandler) handleAddStudent() {
 }
 
 func (h *CLIHandler) handleDisplayInfo() {
-	classes := h.classService.GetAllClasses()
+	classes := h.schoolService.GetAllClasses()
+
 	fmt.Println("\n======= TỔNG HỢP THÔNG TIN =======")
 	if len(classes) == 0 {
 		fmt.Println("Chưa có dữ liệu.")
 		return
 	}
+
 	for _, class := range classes {
-		class.Display() 
+		fmt.Printf("\n--- Lớp: %s | Sĩ số: %d ---\n", class.Name, class.NumOfStudents)
+
+		studentsInClass := h.schoolService.GetStudentsByClassName(class.Name)
+
+		if len(studentsInClass) == 0 {
+			fmt.Println("  (Lớp này chưa có sinh viên nào)")
+		} else {
+			for i, student := range studentsInClass {
+				fmt.Printf("  %d. %s\n", i+1, student.Name)
+			}
+		}
 	}
 }
 
