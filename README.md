@@ -14,3 +14,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 7. [Hàm](./functions/README.md)
 8. [Con trỏ (Pointers)](./pointers/README.md)
 9. [Struct](./struct/README.md)
+10. [Method](./method/README.md)
+11. [Interface, embedding](./interface-embedding/README.md)
