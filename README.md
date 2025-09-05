@@ -16,3 +16,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 9. [Struct](./struct/README.md)
 10. [Method](./method/README.md)
 11. [Interface, embedding](./interface-embedding/README.md)
+12. [Concurrency (Goroutines)](./concurrency/README.md)
+13. [Channels](./channels/README.md)
