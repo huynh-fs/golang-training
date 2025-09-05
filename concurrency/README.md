@@ -78,5 +78,4 @@ Dự án này là một bài thực hành về các khái niệm quan trọng tr
 
 - **Goroutines**: Mỗi URL được xử lý trong một goroutine riêng biệt, được khởi tạo bằng từ khóa `go`. Điều này cho phép các request HTTP được thực hiện đồng thời.
 - **`sync.WaitGroup`**: Được sử dụng như một cơ chế đồng bộ hóa mạnh mẽ. Goroutine chính sẽ bị chặn tại `wg.Wait()` cho đến khi tất cả các goroutine worker gọi `wg.Done()`, đảm bảo chương trình không kết thúc trước khi tất cả công việc hoàn thành.
-- **Channels**: Được sử dụng như một kênh giao tiếp an toàn để các goroutine worker gửi kết quả (`fetcher.Result`) trở lại goroutine chính để xử lý và hiển thị.
 - **Phân tách các mối quan tâm (Separation of Concerns)**: Logic được phân tách rõ ràng: `main.go` chỉ khởi chạy, `cli.go` xử lý tương tác người dùng, và `fetcher.go` thực hiện công việc cốt lõi.

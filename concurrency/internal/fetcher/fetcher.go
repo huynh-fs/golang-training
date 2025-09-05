@@ -8,36 +8,29 @@ import (
 	"sync"
 )
 
-type Result struct {
-	URL        string
-	Title      string
-	Err        error
-}
-
 var titleRegex = regexp.MustCompile(`(?i)<title>(.*?)</title>`)
 
-func FetchTitle(url string, wg *sync.WaitGroup, results chan<- Result) {
+func FetchAndPrintTitle(url string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	resp, err := http.Get(url)
 	if err != nil {
-		results <- Result{URL: url, Err : err}
+		fmt.Printf("Lỗi khi lấy %s: %v\n", url, err)
 		return
 	}
-
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		results <- Result{URL: url, Err : err}
+		fmt.Printf("Lỗi khi đọc %s: %v\n", url, err)
 		return
 	}
 
 	matches := titleRegex.FindStringSubmatch(string(body))
 	if len(matches) < 2 {
-		results <- Result{URL: url, Err : fmt.Errorf("no title found")}
+		fmt.Printf("Lỗi khi lấy %s: không tìm thấy thẻ title\n", url)
 		return
 	}
 
-	results <- Result{URL: url, Title: matches[1]}
+	fmt.Printf("%s -> \"%s\"\n", url, matches[1])
 }
