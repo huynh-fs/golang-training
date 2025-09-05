@@ -23,31 +23,19 @@ func processURLs(urls []string) {
 	}
 
 	var wg sync.WaitGroup
-	resultsChan := make(chan fetcher.Result, len(urls))
 
 	for _, url := range urls {
 		wg.Add(1)
 		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 			url = "https://" + url
 		}
-		go fetcher.FetchTitle(url, &wg, resultsChan)
+		go fetcher.FetchAndPrintTitle(url, &wg)
 	}
 
-	go func() {
-		wg.Wait()
-		close(resultsChan)
-	}()
-
-	fmt.Println("\n--- Kết quả ---")
-	for result := range resultsChan {
-		if result.Err != nil {
-			fmt.Printf("Lỗi khi lấy %s: %v\n", result.URL, result.Err)
-		} else {
-			fmt.Printf("%s -> \"%s\"\n", result.URL, result.Title)
-		}
-	}
+	wg.Wait()
 	fmt.Println("--- Hoàn thành ---")
 }
+
 
 func Run() error {
 	scanner := bufio.NewScanner(os.Stdin)
