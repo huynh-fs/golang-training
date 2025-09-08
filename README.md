@@ -18,3 +18,4 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 11. [Interface, embedding](./interface-embedding/README.md)
 12. [Concurrency (Goroutines)](./concurrency/README.md)
 13. [Channels](./channels/README.md)
+14. [Worker pool](./worker-pool/README.md)
