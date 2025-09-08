@@ -19,3 +19,4 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 12. [Concurrency (Goroutines)](./concurrency/README.md)
 13. [Channels](./channels/README.md)
 14. [Worker pool](./worker-pool/README.md)
+15. [Các phương pháp xử lý lỗi & Defer, panic, recover](./error-handling/README.md)
