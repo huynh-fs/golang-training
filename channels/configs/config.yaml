@@ -1,0 +1,2 @@
+processor:
+  parser_workers: 4 # số lượng goroutine sẽ chạy để phân tích log
