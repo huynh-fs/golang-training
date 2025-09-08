@@ -1,0 +1,3 @@
+worker_pool:
+  workers: 4
+  tasks: 20 
