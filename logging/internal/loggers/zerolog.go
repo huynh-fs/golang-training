@@ -1,4 +1,3 @@
-// internal/loggers/zerolog.go
 package loggers
 
 import (
@@ -8,11 +7,8 @@ import (
 	"os"
 )
 
-// DemonstrateZerolog shows structured logging with zerolog.
 func DemonstrateZerolog() {
 	fmt.Println("--- Bắt đầu minh họa Zerolog ---")
-	// Mặc định zerolog ghi ra console với định dạng dễ đọc hơn JSON
-	// Để có output JSON chuẩn, ta cần cấu hình lại
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	log.Info().
