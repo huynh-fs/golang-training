@@ -1,4 +1,6 @@
-package handler
+// File: internal/pkg/output/csv_writer.go
+
+package output
 
 import (
 	"github.com/huynh-fs/file/internal/model"
@@ -11,7 +13,7 @@ import (
 
 const outputFileName = "bingo_result.csv"
 
-func WriteResult(data *model.ResultData) error {
+func WriteToCSV(data *model.ResultData) error {
 	file, err := os.Create(outputFileName)
 	if err != nil {
 		return fmt.Errorf("không thể tạo file: %w", err)
@@ -21,12 +23,10 @@ func WriteResult(data *model.ResultData) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	// ghi tấm vé ban đầu
 	for _, row := range data.InitialTicket {
 		if err := writeRow(writer, row[:]); err != nil { return err }
 	}
 
-	// ghi các số đã gọi
 	calledStrs := make([]string, len(data.CalledNumbers))
 	for i, num := range data.CalledNumbers {
 		calledStrs[i] = strconv.Itoa(num)
@@ -35,12 +35,10 @@ func WriteResult(data *model.ResultData) error {
 		return err
 	}
 
-	// ghi dòng thắng
 	if err := writer.Write([]string{data.WinLine}); err != nil {
 		return err
 	}
 
-	// ghi tấm vé cuối cùng
 	for _, row := range data.FinalTicket {
 		if err := writeRow(writer, row[:]); err != nil { return err }
 	}
