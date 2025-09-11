@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/huynh-fs/file/internal/model"
-	"fmt"
 	"time"
 )
 
@@ -20,12 +19,12 @@ func NewGameService() *GameService {
 	}
 }
 
-func (s *GameService) Play() *model.ResultData {
-	fmt.Println("Bắt đầu trò chơi BINGO!")
-	fmt.Println("Tấm vé của bạn:")
-	s.printTicket(s.ticket)
+func (s *GameService) Play(events chan <- model.GameEvent) *model.ResultData {
+	defer close(events)
 
 	s.marked[2][2] = true // ô giữa là ô free
+
+	events <- model.GameEvent{Type: model.InitialTicketRender, Ticket: s.ticket}
 
 	var winLine string
 	for {
@@ -33,25 +32,22 @@ func (s *GameService) Play() *model.ResultData {
 
 		num, err := s.randSvc.Draw(1, 75)
 		if err != nil {
-			fmt.Println("Lỗi:", err)
 			break
 		}
 		s.calledNumbers = append(s.calledNumbers, num)
-		fmt.Printf("Số vừa ra: %d\n", num)
-
 		s.markNumber(num)
+
+		events <- model.GameEvent{Type: model.NumberDrawn, Number: num}
 
 		win, line := CheckWin(s.marked)
 		if win {
 			winLine = line
-			fmt.Printf("\n%s\n", winLine)
+			events <- model.GameEvent{Type: model.GameWon, Message: line}
 			break
 		}
 	}
 
 	finalTicket := s.createFinalTicket()
-	fmt.Println("\nTấm vé cuối cùng của bạn:")
-	s.printMarked()
 
 	return &model.ResultData{
 		InitialTicket:   *s.ticket,
@@ -90,33 +86,4 @@ func (s *GameService) createFinalTicket() *model.Ticket {
 		}
 	}
 	return &finalTicket
-}
-
-func (s *GameService) printTicket(ticket *model.Ticket) {
-	fmt.Println("-----------------")
-	for r := 0; r < model.TicketSize; r++ {
-		for c := 0; c < model.TicketSize; c++ {
-			if ticket[r][c] == 0 {
-				fmt.Printf(" * ")
-			} else {
-				fmt.Printf("%2d ", ticket[r][c])
-			}
-		}
-		fmt.Println()
-	}
-	fmt.Println("-----------------")
-}
-
-func (s *GameService) printMarked() {
-	fmt.Println("-----------------")
-	for r := 0; r < model.TicketSize; r++ {
-		for c := 0; c < model.TicketSize; c++ {
-			if s.marked[r][c] || s.ticket[r][c] == 0 {
-				fmt.Printf(" * ")
-			} else {
-				fmt.Printf("%2d ", s.ticket[r][c])
-			}
-		}
-		fmt.Println()
-	}
 }
