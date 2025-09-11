@@ -1,0 +1,149 @@
+basePath: /api/v1
+definitions:
+  dto.CreateTodoDTO:
+    properties:
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  dto.UpdateTodoDTO:
+    properties:
+      completed:
+        type: boolean
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  model.Todo:
+    properties:
+      completed:
+        type: boolean
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Một API đơn giản để quản lý danh sách công việc.
+  title: Todo List API
+  version: "1.0"
+paths:
+  /todos:
+    get:
+      description: Lấy tất cả công việc trong danh sách
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Todo'
+            type: array
+      summary: Lấy danh sách công việc
+      tags:
+      - todos
+    post:
+      consumes:
+      - application/json
+      description: Thêm một công việc mới vào danh sách với trạng thái mặc định là
+        chưa hoàn thành
+      parameters:
+      - description: Chỉ cần nhập tiêu đề công việc
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTodoDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Todo'
+      summary: Tạo một công việc mới
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      description: Xóa một công việc khỏi danh sách
+      parameters:
+      - description: ID Công việc
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Xóa một công việc
+      tags:
+      - todos
+    get:
+      description: Lấy thông tin chi tiết của một công việc
+      parameters:
+      - description: ID Công việc
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Todo'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Lấy một công việc theo ID
+      tags:
+      - todos
+    put:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin của một công việc đã có
+      parameters:
+      - description: ID Công việc
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Thông tin cập nhật
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTodoDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Todo'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Cập nhật một công việc
+      tags:
+      - todos
+swagger: "2.0"
