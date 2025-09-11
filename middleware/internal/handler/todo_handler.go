@@ -29,6 +29,7 @@ func NewTodoHandler(s *service.TodoService) *TodoHandler {
 // @Param        todo  body   dto.CreateTodoDTO  true  "Chỉ cần nhập tiêu đề công việc"
 // @Success      200  {object}  model.Todo
 // @Router       /todos [post]
+// @Security BearerAuth
 func (h *TodoHandler) CreateTodo(c *gin.Context) {
 	var input dto.CreateTodoDTO
 
@@ -53,6 +54,7 @@ func (h *TodoHandler) CreateTodo(c *gin.Context) {
 // @Produce  json
 // @Success 200 {array} model.Todo
 // @Router /todos [get]
+// @Security BearerAuth
 func (h *TodoHandler) GetTodos(c *gin.Context) {
 	todos, err := h.Service.GetAllTodos()
 	if err != nil {
@@ -71,6 +73,7 @@ func (h *TodoHandler) GetTodos(c *gin.Context) {
 // @Success 200 {object} model.Todo
 // @Failure 404 {object} map[string]interface{}
 // @Router /todos/{id} [get]
+// @Security BearerAuth
 func (h *TodoHandler) GetTodo(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
 	todo, err := h.Service.GetTodoByID(uint(id))
@@ -92,6 +95,7 @@ func (h *TodoHandler) GetTodo(c *gin.Context) {
 // @Success 200 {object} model.Todo
 // @Failure 404 {object} map[string]interface{}
 // @Router /todos/{id} [put]
+// @Security BearerAuth
 func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 	var input dto.UpdateTodoDTO
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
@@ -116,6 +120,7 @@ func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Router /todos/{id} [delete]
+// @Security BearerAuth
 func (h *TodoHandler) DeleteTodo(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
 

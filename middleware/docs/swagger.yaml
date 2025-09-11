@@ -42,6 +42,8 @@ paths:
             items:
               $ref: '#/definitions/model.Todo'
             type: array
+      security:
+      - BearerAuth: []
       summary: Lấy danh sách công việc
       tags:
       - todos
@@ -64,6 +66,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Todo'
+      security:
+      - BearerAuth: []
       summary: Tạo một công việc mới
       tags:
       - todos
@@ -89,6 +93,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Xóa một công việc
       tags:
       - todos
@@ -112,6 +118,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Lấy một công việc theo ID
       tags:
       - todos
@@ -143,7 +151,15 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Cập nhật một công việc
       tags:
       - todos
+securityDefinitions:
+  BearerAuth:
+    description: Type "your-secret-api-key" to get access
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

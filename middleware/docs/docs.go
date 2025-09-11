@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/todos": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Lấy tất cả công việc trong danh sách",
                 "produces": [
                     "application/json"
@@ -38,6 +43,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Thêm một công việc mới vào danh sách với trạng thái mặc định là chưa hoàn thành",
                 "consumes": [
                     "application/json"
@@ -72,6 +82,11 @@ const docTemplate = `{
         },
         "/todos/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Lấy thông tin chi tiết của một công việc",
                 "produces": [
                     "application/json"
@@ -106,6 +121,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Cập nhật thông tin của một công việc đã có",
                 "consumes": [
                     "application/json"
@@ -152,6 +172,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Xóa một công việc khỏi danh sách",
                 "produces": [
                     "application/json"
@@ -224,6 +249,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"your-secret-api-key\" to get access",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

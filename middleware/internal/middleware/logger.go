@@ -7,12 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// LoggerMiddleware ghi log các request.
 func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
 
-		// Xử lý request.
 		c.Next()
 
 		endTime := time.Now()

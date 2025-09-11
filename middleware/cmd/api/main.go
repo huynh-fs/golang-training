@@ -14,6 +14,11 @@ import (
 // @description     Một API đơn giản để quản lý danh sách công việc.
 // @host            localhost:8080
 // @BasePath        /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "your-secret-api-key" to get access
 func main() {
 	// kết nối database
 	database.Connect()

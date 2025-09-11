@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/huynh-fs/gin-api/internal/handler"
+	"github.com/huynh-fs/gin-api/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -10,11 +11,16 @@ import (
 )
 
 func Setup(todoHandler *handler.TodoHandler) *gin.Engine {
-	r := gin.Default()
+	r := gin.New()
+
+	r.Use(middleware.LoggerMiddleware())
+
+	r.Use(gin.Recovery())
 
 	apiV1 := r.Group("/api/v1")
 	{
 		todos := apiV1.Group("/todos")
+		todos.Use(middleware.AuthMiddleware())
 		{
 			todos.POST("", todoHandler.CreateTodo)
 			todos.GET("", todoHandler.GetTodos)

@@ -14,7 +14,6 @@ WORKDIR /root/
 RUN apk add --no-cache bash
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
 
 # Copy script wait-for-it vào trong image
 COPY scripts/wait-for-it.sh .
