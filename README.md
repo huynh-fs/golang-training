@@ -22,3 +22,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 15. [Các phương pháp xử lý lỗi & Defer, panic, recover](./error-handling/README.md)
 16. [Logging, debugging](./logging/README.md)
 17. [Đọc/ghi file](./file/README.md)
+18. [Kết nối và thao tác với PostgreSQL/MySQL](./sql/README.md)
+19. [Xây dựng API cơ bản với Gin](./gin-api/README.md)
