@@ -6,6 +6,7 @@ import (
 	"github.com/huynh-fs/gin-api/internal/router"
 	"github.com/huynh-fs/gin-api/internal/handler"
 	"github.com/huynh-fs/gin-api/internal/service"
+	"github.com/huynh-fs/gin-api/pkg/config"
 	_ "github.com/huynh-fs/gin-api/docs" 
 )
 
@@ -20,15 +21,28 @@ import (
 // @name Authorization
 // @description Type "your-secret-api-key" to get access
 func main() {
-	// kết nối database
-	database.Connect()
+	// tải cấu hình
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("Không thể tải file .env: %v", err)
+	}
 
-	// khởi tạo handler với service
-	todoService := service.NewTodoService(database.DB)
+	// kết nối database
+	db, err := database.Connect(cfg.DSN())
+	if err != nil {
+		log.Fatalf("Không thể kết nối database: %v", err)
+	}
+
+	// khởi tạo service
+	todoService := service.NewTodoService(db)
+	authService := service.NewAuthService(db, cfg)
+
+	// khởi tạo handler
 	todoHandler := handler.NewTodoHandler(todoService)
+	authHandler := handler.NewAuthHandler(authService)
 
 	// thiết lập router
-	r := router.Setup(todoHandler)
+	r := router.Setup(cfg, todoHandler, authHandler)
 
 	log.Println("Starting server on port 8080...")
 	if err := r.Run(":8080"); err != nil {

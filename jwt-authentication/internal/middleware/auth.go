@@ -3,11 +3,14 @@ package middleware
 import (
 	"net/http"
 	"strings"
+	"github.com/huynh-fs/gin-api/pkg/config"
+	"github.com/huynh-fs/gin-api/internal/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -21,12 +24,19 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		token := parts[1]
+		tokenString := parts[1]
+		claims := &service.Claims{}
 
-		if token != "123456789" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(cfg.JWTAccessSecret), nil
+		})
+
+		if err != nil || !token.Valid {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid access token"})
 			return
 		}
+
+		c.Set("userID", claims.UserID)
 
 		c.Next()
 	}

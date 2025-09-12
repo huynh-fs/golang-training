@@ -7,6 +7,41 @@ definitions:
     required:
     - title
     type: object
+  dto.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.RegisterRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.TokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
   dto.UpdateTodoDTO:
     properties:
       completed:
@@ -30,6 +65,115 @@ info:
   title: Todo List API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Đăng nhập
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refresh token to revoke
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TokenRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Đăng xuất và thu hồi refresh token
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refresh token
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh access token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User registration info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Đăng kí người dùng mới
+      tags:
+      - auth
   /todos:
     get:
       description: Lấy tất cả công việc trong danh sách
