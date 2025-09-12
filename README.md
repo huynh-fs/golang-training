@@ -24,3 +24,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 17. [Đọc/ghi file](./file/README.md)
 18. [Kết nối và thao tác với PostgreSQL/MySQL](./sql/README.md)
 19. [Xây dựng API cơ bản với Gin](./gin-api/README.md)
+20. [Middleware](./middleware/README.md)
+21. [JWT authentication](./jwt-authentication/README.md)
