@@ -1,76 +1,70 @@
-## Hệ thống Xác thực JWT cho dự án Todo List
+# Go Gin API - Advanced JWT Authentication & Clean Architecture
 
-Dự án này tích hợp một hệ thống xác thực chuyên nghiệp sử dụng JSON Web Tokens (JWT), được thiết kế để cân bằng giữa bảo mật và trải nghiệm người dùng. Kiến trúc này dựa trên việc sử dụng hai loại token: **Access Token** và **Refresh Token**.
+Dự án này là một API RESTful hoàn chỉnh, được xây dựng bằng Go và Gin, thể hiện một kiến trúc ứng dụng production-ready. Nó cung cấp các chức năng CRUD cho một ứng dụng "Todo List" và tích hợp một hệ thống **xác thực JWT (Access & Refresh Token)** đầy đủ với khả năng thu hồi token.
 
-### Các thành phần chính
+Điểm nhấn của dự án là việc áp dụng các nguyên tắc **Clean Architecture**, **Dependency Injection (DI)**, và một **chiến lược kiểm thử tập trung** để đảm bảo chất lượng, độ tin cậy và khả năng bảo trì của mã nguồn.
 
-#### 1. Access Token
+- **Ngôn ngữ:** Go
+- **Framework:** Gin
+- **ORM:** GORM
+- **Cơ sở dữ liệu:** PostgreSQL
+- **Xác thực:** JWT (Access & Refresh Tokens)
+- **Kiểm thử:** Unit Testing chuyên sâu với Mockery & Testify
+- **Triển khai:** Docker & Docker Compose
+- **Tài liệu API:** Swagger
 
-- **Mục đích:** Dùng để xác thực các request truy cập tài nguyên được bảo vệ (ví dụ: các API trong nhóm `/api/v1/todos/`).
-- **Đặc điểm:**
-  - **Thời gian sống ngắn (ví dụ: 15 phút)** để giảm thiểu rủi ro nếu token bị lộ.
-  - **Stateless:** Server xác thực token chỉ bằng chữ ký bí mật (`JWT_ACCESS_SECRET`) mà không cần truy vấn database, giúp tăng hiệu năng.
-- **Sử dụng:** Được gửi kèm trong header `Authorization` của mỗi request API theo định dạng `Bearer <access_token>`.
+## Kiến trúc và Các tính năng chính
 
-#### 2. Refresh Token
+- **Kiến trúc phân tầng (Handler, Service, Repository):** Tách biệt rõ ràng các mối quan tâm, giúp mã nguồn linh hoạt và dễ kiểm thử.
+- **Dependency Injection (DI):** Không sử dụng biến toàn cục. Tất cả các phụ thuộc được "tiêm" từ `main.go`.
+- **Hệ thống xác thực JWT chuyên nghiệp:** Bao gồm Access/Refresh Token, cơ chế thu hồi (Revocation) và xoay vòng (Rotation).
+- **Môi trường Dockerized hoàn chỉnh:** Triển khai nhất quán và đáng tin cậy.
 
-- **Mục đích:** Dùng để yêu cầu một cặp token mới (cả Access và Refresh) khi `Access Token` đã hết hạn.
-- **Đặc điểm:**
-  - **Thời gian sống dài (ví dụ: 7 ngày)**, cho phép người dùng duy trì phiên đăng nhập mà không cần nhập lại mật khẩu.
-  - **Stateful & Có thể thu hồi:** Refresh Token được lưu trữ trong cơ sở dữ liệu. Điều này là mấu chốt để thực hiện chức năng đăng xuất và thu hồi.
-- **Sử dụng:** Chỉ được gửi đến một endpoint duy nhất là `/auth/refresh`.
+---
 
-### Các tính năng bảo mật nâng cao
+## Chiến lược Kiểm thử (Testing)
 
-#### Thu hồi Token (Token Revocation)
+Dự án áp dụng một chiến lược kiểm thử tập trung và hiệu quả, đặt trọng tâm vào nơi chứa nhiều logic nghiệp vụ phức tạp nhất: **Tầng Service**. Bằng cách đảm bảo tầng Service được kiểm thử 100%, chúng ta có thể tự tin rằng cốt lõi của ứng dụng hoạt động chính xác trong mọi tình huống.
 
-- **Cách hoạt động:** Khi người dùng đăng xuất (`/auth/logout`), refresh token tương ứng sẽ bị **xóa khỏi database**.
-- **Lợi ích:** Điều này ngay lập tức vô hiệu hóa khả năng tạo token mới từ refresh token đó, kể cả khi nó chưa hết hạn. Đây là một biện pháp bảo mật quan trọng để xử lý các trường hợp như người dùng bị mất thiết bị hoặc muốn đăng xuất khỏi tất cả các thiết bị.
+### Trụ cột chính: Unit Testing Tầng Service
 
-#### Xoay vòng Token (Token Rotation)
+Mục tiêu của Unit Test là kiểm tra logic nghiệp vụ (business logic) của từng `Service` một cách **hoàn toàn cô lập**, không phụ thuộc vào database hay các thành phần bên ngoài khác. Điều này giúp bộ test chạy cực kỳ nhanh, đáng tin cậy và có thể được tích hợp dễ dàng vào các quy trình CI/CD.
 
-- **Cách hoạt động:** Mỗi khi client sử dụng một refresh token hợp lệ để gọi `/auth/refresh`, một cặp Access và Refresh token **hoàn toàn mới** sẽ được tạo ra. Refresh token cũ sẽ bị vô hiệu hóa (xóa khỏi DB).
-- **Lợi ích:** Tính năng này giúp ngăn chặn việc tái sử dụng refresh token đã bị lộ. Nếu kẻ tấn công đánh cắp và sử dụng refresh token, người dùng thật sẽ ngay lập tức phát hiện ra khi refresh token của họ không còn hợp lệ.
+#### Các nguyên tắc và công cụ chính:
 
-### Luồng xác thực (Authentication Flow)
+- **Kiến trúc hướng Interface (Interface-Driven Architecture):**
+  Các `Service` không phụ thuộc trực tiếp vào GORM, mà phụ thuộc vào các `interface` (`UserRepository`, `TodoRepository`). Đây là nền tảng cốt lõi cho phép chúng ta áp dụng mocking một cách hiệu quả.
 
-1.  **Đăng ký (`POST /auth/register`):** Người dùng tạo tài khoản với `username` và `password`.
-2.  **Đăng nhập (`POST /auth/login`):**
-    - Client gửi `username` và `password`.
-    - Server xác thực, sau đó tạo và trả về một cặp `access_token` và `refresh_token`.
-3.  **Truy cập API (`GET /api/v1/todos`):**
-    - Client đính kèm `access_token` vào header `Authorization: Bearer <access_token>`.
-    - Server xác thực token và trả về dữ liệu.
-4.  **Làm mới Token (`POST /auth/refresh`):**
-    - Khi `access_token` hết hạn (server trả lỗi `401 Unauthorized`), client gửi `refresh_token` trong body request.
-    - Server kiểm tra `refresh_token` trong DB:
-      - Nếu hợp lệ, server tạo một cặp token **mới**, xóa token cũ khỏi DB, và trả về cặp token mới cho client.
-      - Nếu không hợp lệ (đã bị thu hồi), server trả lỗi.
-5.  **Đăng xuất (`POST /auth/logout`):**
-    - Client gửi `refresh_token` muốn thu hồi.
-    - Server tìm và xóa `refresh_token` đó khỏi DB. Mọi nỗ lực sử dụng token này trong tương lai sẽ thất bại.
+- **Mocking toàn diện với `mockery`:**
+  Chúng ta sử dụng `mockery` để tự động sinh ra các đối tượng "giả" (mocks) từ các `interface` repository. Trong các bài test, chúng ta có thể ra lệnh cho các mock này trả về bất kỳ dữ liệu hoặc lỗi nào mong muốn. Điều này cho phép chúng ta dễ dàng kiểm tra tất cả các luồng logic, bao gồm cả các trường hợp lỗi khó tái tạo (ví dụ: lỗi kết nối database, dữ liệu không tìm thấy, v.v.).
 
-### Cách sử dụng và kiểm thử
+- **Table-Driven Tests:**
+  Tất cả các bài test cho Service đều được viết theo pattern Table-Driven. Mỗi hàm test định nghĩa một "bảng" các trường hợp kiểm thử, sau đó chạy chúng trong một vòng lặp duy nhất. Phương pháp này giúp code test:
+  - **Ngắn gọn và không lặp lại (DRY).**
+  - **Dễ đọc:** Tất cả các kịch bản được liệt kê rõ ràng.
+  - **Cực kỳ dễ mở rộng:** Thêm một trường hợp test mới chỉ đơn giản là thêm một phần tử vào slice.
 
-#### Sử dụng cURL
+### Về việc Kiểm thử Tầng Handler
+
+Tầng Handler trong kiến trúc này được thiết kế để **mỏng nhất có thể**. Trách nhiệm chính của nó chỉ bao gồm:
+
+1.  Đọc và xác thực dữ liệu đầu vào (binding DTO).
+2.  Gọi phương thức tương ứng ở tầng Service.
+3.  Chuyển đổi kết quả (dữ liệu hoặc lỗi) từ Service thành một HTTP response thích hợp.
+
+Với bộ unit test toàn diện cho tầng Service, việc viết các bài test tích hợp đầy đủ cho tầng Handler có thể dẫn đến sự trùng lặp trong việc kiểm tra logic nghiệp vụ. Do đó, chiến lược của dự án là tập trung nguồn lực vào việc đảm bảo tầng Service - nơi chứa đựng bộ não của ứng dụng - hoạt động một cách hoàn hảo.
+
+### Cách chạy bộ Unit Test
+
+Các bài test này không yêu cầu bất kỳ phụ thuộc bên ngoài nào (như database) phải đang chạy.
 
 ```bash
-# 1. Đăng nhập để lấy token
-TOKENS=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username": "testuser", "password": "password123"}')
-
-ACCESS_TOKEN=$(echo $TOKENS | jq -r '.access_token')
-
-# 2. Gọi API được bảo vệ với Access Token
-curl -X GET http://localhost:8080/api/v1/todos \
-  -H "Authorization: Bearer $ACCESS_TOKEN"
+# Chạy tất cả các unit test cho tầng service
+go test -v ./internal/service/...
 ```
 
-#### Sử dụng Swagger UI
+Để thực thi tất cả các file test có trong dự án, bạn có thể chạy từ thư mục gốc:
 
-1.  Truy cập [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html).
-2.  Sử dụng endpoint `/auth/login` để lấy `access_token` và `refresh_token`.
-3.  Nhấn vào nút **`Authorize`** ở góc trên bên phải.
-4.  Trong hộp thoại, tại mục `BearerAuth`, nhập giá trị theo định dạng `Bearer <your_access_token>`.
-5.  Nhấn **Authorize**. Giờ đây, bạn có thể kiểm thử tất cả các API được bảo vệ.
+```bash
+go test -v ./...
+```

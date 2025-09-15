@@ -191,21 +191,29 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lấy tất cả công việc trong danh sách",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "todos"
                 ],
-                "summary": "Lấy danh sách công việc",
+                "summary": "Lấy danh sách công việc của người dùng",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Todo"
+                                "$ref": "#/definitions/dto.TodoResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }
@@ -217,7 +225,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Thêm một công việc mới vào danh sách với trạng thái mặc định là chưa hoàn thành",
                 "consumes": [
                     "application/json"
                 ],
@@ -230,20 +237,38 @@ const docTemplate = `{
                 "summary": "Tạo một công việc mới",
                 "parameters": [
                     {
-                        "description": "Chỉ cần nhập tiêu đề công việc",
+                        "description": "Thông tin công việc mới",
                         "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateTodoDTO"
+                            "$ref": "#/definitions/dto.CreateTodoRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.Todo"
+                            "$ref": "#/definitions/dto.TodoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -256,7 +281,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Lấy thông tin chi tiết của một công việc",
                 "produces": [
                     "application/json"
                 ],
@@ -277,14 +301,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Todo"
+                            "$ref": "#/definitions/dto.TodoResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -295,7 +321,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Cập nhật thông tin của một công việc đã có",
                 "consumes": [
                     "application/json"
                 ],
@@ -315,12 +340,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Thông tin cập nhật",
+                        "description": "Thông tin cập nhật (chỉ cần gửi các trường muốn thay đổi)",
                         "name": "todo",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateTodoDTO"
+                            "$ref": "#/definitions/dto.UpdateTodoRequest"
                         }
                     }
                 ],
@@ -328,14 +353,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Todo"
+                            "$ref": "#/definitions/dto.TodoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -346,7 +382,6 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Xóa một công việc khỏi danh sách",
                 "produces": [
                     "application/json"
                 ],
@@ -364,18 +399,16 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -383,12 +416,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CreateTodoDTO": {
+        "dto.CreateTodoRequest": {
             "type": "object",
             "required": [
                 "title"
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -425,6 +461,32 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.TodoResponse": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.TokenRequest": {
             "type": "object",
             "required": [
@@ -447,25 +509,14 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateTodoDTO": {
+        "dto.UpdateTodoRequest": {
             "type": "object",
-            "required": [
-                "title"
-            ],
             "properties": {
                 "completed": {
                     "type": "boolean"
                 },
-                "title": {
+                "description": {
                     "type": "string"
-                }
-            }
-        },
-        "model.Todo": {
-            "type": "object",
-            "properties": {
-                "completed": {
-                    "type": "boolean"
                 },
                 "title": {
                     "type": "string"

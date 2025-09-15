@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/huynh-fs/gin-api/internal/model"
+	"github.com/huynh-fs/gin-api/internal/repository"
 	"github.com/huynh-fs/gin-api/pkg/config"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,18 +18,22 @@ type Claims struct {
 }
 
 type AuthService struct {
-	db *gorm.DB
+	userRepo repository.UserRepository
+	refreshTokenRepo repository.RefreshTokenRepository
 	config *config.Config
 }
 
-func NewAuthService(db *gorm.DB, config *config.Config) *AuthService {
-	return &AuthService{db: db, config: config}
+func NewAuthService(userRepo repository.UserRepository, refreshTokenRepo repository.RefreshTokenRepository, config *config.Config) *AuthService {
+	return &AuthService{userRepo: userRepo, refreshTokenRepo: refreshTokenRepo, config: config}
 }
 
 func (s *AuthService) Register(username, password string) (*model.User, error) {
-	var existingUser model.User
-	if err := s.db.Where("username = ?", username).First(&existingUser).Error; err == nil {
+	_, err := s.userRepo.FindByUsername(username)
+	if err == nil {
 		return nil, errors.New("username already exists")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err 
 	}
 
 	user := model.User{Username: username}
@@ -36,23 +41,55 @@ func (s *AuthService) Register(username, password string) (*model.User, error) {
 		return nil, err
 	}
 
-	if err := s.db.Create(&user).Error; err != nil {
+	if err := s.userRepo.Create(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
 func (s *AuthService) Login(username, password string) (accessToken string, refreshToken string, err error) {
-	var user model.User
-	if err := s.db.Where("username = ?", username).First(&user).Error; err != nil {
-		return "", "", errors.New("invalid credentials")
-	}
+    user, err := s.userRepo.FindByUsername(username)
+    if err != nil {
+        return "", "", errors.New("invalid credentials")
+    }
 
-	if err := user.CheckPassword(password); err != nil {
-		return "", "", errors.New("invalid credentials")
-	}
+    if err = user.CheckPassword(password); err != nil {
+        return "", "", errors.New("invalid credentials")
+    }
 
-	return s.generateTokens(user.ID)
+    return s.generateTokens(user.ID)
+}
+
+func (s *AuthService) RefreshToken(tokenString string) (newAccessToken string, newRefreshToken string, err error) {
+    claims := &Claims{}
+    token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+        return []byte(s.config.JWTRefreshSecret), nil
+    })
+    if err != nil || !token.Valid {
+        return "", "", errors.New("invalid refresh token")
+    }
+
+    dbToken, err := s.refreshTokenRepo.FindByToken(tokenString)
+    if err != nil {
+        return "", "", errors.New("refresh token has been revoked or is invalid")
+    }
+
+    if err := s.refreshTokenRepo.Delete(dbToken.Token); err != nil {
+        return "", "", err
+    }
+
+    return s.generateTokens(claims.UserID)
+}
+
+func (s *AuthService) Logout(tokenString string) error {
+    	err := s.refreshTokenRepo.Delete(tokenString)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("token not found or already revoked")
+		}
+		return err 
+	}
+	return nil
 }
 
 func (s *AuthService) generateTokens(userID uint) (accessToken string, refreshToken string, err error) {
@@ -87,41 +124,9 @@ func (s *AuthService) generateTokens(userID uint) (accessToken string, refreshTo
 		Token:     refreshToken, 
 		ExpiresAt: refreshExpiresAt,
 	}
-	if err := s.db.Create(&dbToken).Error; err != nil {
+	if err := s.refreshTokenRepo.Create(&dbToken); err != nil {
 		return "", "", err
 	}
 
 	return accessToken, refreshToken, nil
-}
-
-func (s *AuthService) RefreshToken(tokenString string) (newAccessToken string, newRefreshToken string, err error) {
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(s.config.JWTRefreshSecret), nil
-	})
-
-	if err != nil || !token.Valid {
-		return "", "", errors.New("invalid refresh token")
-	}
-
-	var dbToken model.RefreshToken
-	if err := s.db.Where("token = ?", tokenString).First(&dbToken).Error; err != nil {
-		return "", "", errors.New("refresh token has been revoked or is invalid")
-	}
-
-	s.db.Delete(&dbToken)
-
-	return s.generateTokens(claims.UserID)
-}
-
-
-func (s *AuthService) Logout(tokenString string) error {
-    result := s.db.Where("token = ?", tokenString).Delete(&model.RefreshToken{})
-    if result.Error != nil {
-        return result.Error
-    }
-    if result.RowsAffected == 0 {
-        return errors.New("token not found or already revoked")
-    }
-    return nil
 }

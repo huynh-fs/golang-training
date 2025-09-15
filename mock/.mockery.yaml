@@ -1,0 +1,10 @@
+# .mockery.yaml
+quiet: False
+# Thư mục chứa các interface của bạn
+dir: "internal/repository"
+# Tên package bên trong file mock được tạo ra
+outpkg: "mocks"
+# Thư mục output cho các file mock
+output: "internal/repository/mocks"
+# Tạo mock cho tất cả các interface tìm thấy trong `dir`
+all: True

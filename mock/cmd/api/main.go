@@ -2,12 +2,14 @@ package main
 
 import (
 	"log"
-	"github.com/huynh-fs/gin-api/pkg/database"
-	"github.com/huynh-fs/gin-api/internal/router"
+
+	_ "github.com/huynh-fs/gin-api/docs"
 	"github.com/huynh-fs/gin-api/internal/handler"
+	"github.com/huynh-fs/gin-api/internal/repository"
+	"github.com/huynh-fs/gin-api/internal/router"
 	"github.com/huynh-fs/gin-api/internal/service"
 	"github.com/huynh-fs/gin-api/pkg/config"
-	_ "github.com/huynh-fs/gin-api/docs" 
+	"github.com/huynh-fs/gin-api/pkg/database"
 )
 
 // @title           Todo List API
@@ -33,9 +35,14 @@ func main() {
 		log.Fatalf("Không thể kết nối database: %v", err)
 	}
 
+	// khởi tạo repository
+	userRepo := repository.NewGormUserRepository(db)
+	refreshTokenRepo := repository.NewGormRefreshTokenRepository(db)
+	todoRepo := repository.NewGormTodoRepository(db)
+
 	// khởi tạo service
-	todoService := service.NewTodoService(db)
-	authService := service.NewAuthService(db, cfg)
+	todoService := service.NewTodoService(todoRepo)
+	authService := service.NewAuthService(userRepo, refreshTokenRepo, cfg)
 
 	// khởi tạo handler
 	todoHandler := handler.NewTodoHandler(todoService)

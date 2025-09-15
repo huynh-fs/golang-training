@@ -1,7 +1,9 @@
 basePath: /api/v1
 definitions:
-  dto.CreateTodoDTO:
+  dto.CreateTodoRequest:
     properties:
+      description:
+        type: string
       title:
         type: string
     required:
@@ -28,6 +30,23 @@ definitions:
     - password
     - username
     type: object
+  dto.TodoResponse:
+    properties:
+      completed:
+        type: boolean
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
   dto.TokenRequest:
     properties:
       refresh_token:
@@ -42,19 +61,12 @@ definitions:
       refresh_token:
         type: string
     type: object
-  dto.UpdateTodoDTO:
+  dto.UpdateTodoRequest:
     properties:
       completed:
         type: boolean
-      title:
+      description:
         type: string
-    required:
-    - title
-    type: object
-  model.Todo:
-    properties:
-      completed:
-        type: boolean
       title:
         type: string
     type: object
@@ -176,7 +188,6 @@ paths:
       - auth
   /todos:
     get:
-      description: Lấy tất cả công việc trong danh sách
       produces:
       - application/json
       responses:
@@ -184,32 +195,48 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Todo'
+              $ref: '#/definitions/dto.TodoResponse'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       security:
       - BearerAuth: []
-      summary: Lấy danh sách công việc
+      summary: Lấy danh sách công việc của người dùng
       tags:
       - todos
     post:
       consumes:
       - application/json
-      description: Thêm một công việc mới vào danh sách với trạng thái mặc định là
-        chưa hoàn thành
       parameters:
-      - description: Chỉ cần nhập tiêu đề công việc
+      - description: Thông tin công việc mới
         in: body
         name: todo
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateTodoDTO'
+          $ref: '#/definitions/dto.CreateTodoRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/model.Todo'
+            $ref: '#/definitions/dto.TodoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       security:
       - BearerAuth: []
       summary: Tạo một công việc mới
@@ -217,7 +244,6 @@ paths:
       - todos
   /todos/{id}:
     delete:
-      description: Xóa một công việc khỏi danh sách
       parameters:
       - description: ID Công việc
         in: path
@@ -227,15 +253,13 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
+        "204":
+          description: No Content
         "404":
           description: Not Found
           schema:
-            additionalProperties: true
+            additionalProperties:
+              type: string
             type: object
       security:
       - BearerAuth: []
@@ -243,7 +267,6 @@ paths:
       tags:
       - todos
     get:
-      description: Lấy thông tin chi tiết của một công việc
       parameters:
       - description: ID Công việc
         in: path
@@ -256,11 +279,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Todo'
+            $ref: '#/definitions/dto.TodoResponse'
         "404":
           description: Not Found
           schema:
-            additionalProperties: true
+            additionalProperties:
+              type: string
             type: object
       security:
       - BearerAuth: []
@@ -270,30 +294,36 @@ paths:
     put:
       consumes:
       - application/json
-      description: Cập nhật thông tin của một công việc đã có
       parameters:
       - description: ID Công việc
         in: path
         name: id
         required: true
         type: integer
-      - description: Thông tin cập nhật
+      - description: Thông tin cập nhật (chỉ cần gửi các trường muốn thay đổi)
         in: body
         name: todo
         required: true
         schema:
-          $ref: '#/definitions/dto.UpdateTodoDTO'
+          $ref: '#/definitions/dto.UpdateTodoRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Todo'
+            $ref: '#/definitions/dto.TodoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not Found
           schema:
-            additionalProperties: true
+            additionalProperties:
+              type: string
             type: object
       security:
       - BearerAuth: []

@@ -32,7 +32,7 @@ func Setup(cfg *config.Config, todoHandler *handler.TodoHandler, authHandler *ha
 		todos.Use(middleware.AuthMiddleware(cfg))
 		{
 			todos.POST("", todoHandler.CreateTodo)
-			todos.GET("", todoHandler.GetTodos)
+			todos.GET("", todoHandler.ListTodos)
 			todos.GET("/:id", todoHandler.GetTodo)
 			todos.PUT("/:id", todoHandler.UpdateTodo)
 			todos.DELETE("/:id", todoHandler.DeleteTodo)
