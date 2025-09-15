@@ -1,19 +1,19 @@
-# Go Gin API - Advanced JWT Authentication & Clean Architecture
+# Go Gin API - High-Performance & Test-Driven Development
 
-Dự án này là một API RESTful hoàn chỉnh, được xây dựng bằng Go và Gin, thể hiện một kiến trúc ứng dụng production-ready. Nó cung cấp các chức năng CRUD cho một ứng dụng "Todo List" và tích hợp một hệ thống **xác thực JWT (Access & Refresh Token)** đầy đủ với khả năng thu hồi token.
+Dự án này là một API RESTful hiệu năng cao, được xây dựng bằng Go và Gin, thể hiện một kiến trúc ứng dụng được tối ưu và kiểm thử toàn diện. Ngoài việc cung cấp các chức năng CRUD và hệ thống **xác thực JWT (Access & Refresh Token)**, dự án này đặt một trọng tâm đặc biệt vào việc **đo lường và đảm bảo hiệu năng** thông qua một bộ benchmark chuyên sâu.
 
-Điểm nhấn của dự án là việc áp dụng các nguyên tắc **Clean Architecture**, **Dependency Injection (DI)**, và một **chiến lược kiểm thử tập trung** để đảm bảo chất lượng, độ tin cậy và khả năng bảo trì của mã nguồn.
+Kiến trúc dự án dựa trên các nguyên tắc **Clean Architecture** và **Dependency Injection**, tạo nền tảng vững chắc cho việc viết mã nguồn không chỉ đúng về mặt logic mà còn nhanh về mặt thực thi.
 
 - **Ngôn ngữ:** Go
 - **Framework:** Gin
 - **ORM:** GORM
 - **Cơ sở dữ liệu:** PostgreSQL
 - **Xác thực:** JWT (Access & Refresh Tokens)
-- **Kiểm thử:** Unit Testing chuyên sâu với Mockery & Testify
+- **Kiểm thử:** Unit Testing & Benchmarking chuyên sâu
 - **Triển khai:** Docker & Docker Compose
 - **Tài liệu API:** Swagger
 
-## Kiến trúc và Các tính năng chính
+## Kiến trúc và Các tính dung chính
 
 - **Kiến trúc phân tầng (Handler, Service, Repository):** Tách biệt rõ ràng các mối quan tâm, giúp mã nguồn linh hoạt và dễ kiểm thử.
 - **Dependency Injection (DI):** Không sử dụng biến toàn cục. Tất cả các phụ thuộc được "tiêm" từ `main.go`.
@@ -22,49 +22,38 @@ Dự án này là một API RESTful hoàn chỉnh, được xây dựng bằng G
 
 ---
 
-## Chiến lược Kiểm thử (Testing)
+## Chiến lược Hiệu năng & Benchmark
 
-Dự án áp dụng một chiến lược kiểm thử tập trung và hiệu quả, đặt trọng tâm vào nơi chứa nhiều logic nghiệp vụ phức tạp nhất: **Tầng Service**. Bằng cách đảm bảo tầng Service được kiểm thử 100%, chúng ta có thể tự tin rằng cốt lõi của ứng dụng hoạt động chính xác trong mọi tình huống.
+Chất lượng của một API không chỉ nằm ở tính đúng đắn của logic mà còn ở tốc độ phản hồi. Dự án này áp dụng một chiến lược benchmark nghiêm ngặt để xác định các điểm nghẽn tiềm tàng, đo lường hiệu suất của các thành phần cốt lõi và đảm bảo ứng dụng hoạt động hiệu quả dưới tải.
 
-### Trụ cột chính: Unit Testing Tầng Service
+Chúng tôi sử dụng công cụ benchmark tích hợp của Go, kết hợp với các kỹ thuật setup nâng cao để có được kết quả đo lường chính xác và đáng tin cậy.
 
-Mục tiêu của Unit Test là kiểm tra logic nghiệp vụ (business logic) của từng `Service` một cách **hoàn toàn cô lập**, không phụ thuộc vào database hay các thành phần bên ngoài khác. Điều này giúp bộ test chạy cực kỳ nhanh, đáng tin cậy và có thể được tích hợp dễ dàng vào các quy trình CI/CD.
+### Hai trụ cột của Benchmarking
 
-#### Các nguyên tắc và công cụ chính:
+#### 1. Unit Benchmarks (Sử dụng Mock)
 
-- **Kiến trúc hướng Interface (Interface-Driven Architecture):**
-  Các `Service` không phụ thuộc trực tiếp vào GORM, mà phụ thuộc vào các `interface` (`UserRepository`, `TodoRepository`). Đây là nền tảng cốt lõi cho phép chúng ta áp dụng mocking một cách hiệu quả.
+- **Mục tiêu:** Đo lường hiệu năng của **thuật toán và logic Go thuần túy** trong tầng Service. Các benchmark này trả lời câu hỏi: "Logic của tôi (ví dụ: hash password, tạo JWT, xử lý dữ liệu) có nhanh không, và nó cấp phát bao nhiêu bộ nhớ?"
+- **Phương pháp:**
+  - Sử dụng các đối tượng "giả" (mocks) được tạo bởi `mockery` để loại bỏ hoàn toàn độ trễ của database và network.
+  - Kết quả đo lường cực kỳ ổn định, lặp lại được và chỉ phản ánh hiệu suất của mã lệnh.
+  - Sử dụng cờ `-benchmem` để phân tích chi tiết số lần và dung lượng bộ nhớ được cấp phát (`allocs/op` và `B/op`), giúp tối ưu hóa việc sử dụng bộ nhớ và giảm tải cho Garbage Collector.
 
-- **Mocking toàn diện với `mockery`:**
-  Chúng ta sử dụng `mockery` để tự động sinh ra các đối tượng "giả" (mocks) từ các `interface` repository. Trong các bài test, chúng ta có thể ra lệnh cho các mock này trả về bất kỳ dữ liệu hoặc lỗi nào mong muốn. Điều này cho phép chúng ta dễ dàng kiểm tra tất cả các luồng logic, bao gồm cả các trường hợp lỗi khó tái tạo (ví dụ: lỗi kết nối database, dữ liệu không tìm thấy, v.v.).
+#### 2. Integration Benchmarks (Sử dụng Database thật)
 
-- **Table-Driven Tests:**
-  Tất cả các bài test cho Service đều được viết theo pattern Table-Driven. Mỗi hàm test định nghĩa một "bảng" các trường hợp kiểm thử, sau đó chạy chúng trong một vòng lặp duy nhất. Phương pháp này giúp code test:
-  - **Ngắn gọn và không lặp lại (DRY).**
-  - **Dễ đọc:** Tất cả các kịch bản được liệt kê rõ ràng.
-  - **Cực kỳ dễ mở rộng:** Thêm một trường hợp test mới chỉ đơn giản là thêm một phần tử vào slice.
+- **Mục tiêu:** Đo lường hiệu năng của **toàn bộ luồng hoạt động từ service đến database**. Các benchmark này trả lời câu hỏi: "Mất bao lâu để thực hiện một thao tác hoàn chỉnh, bao gồm cả việc GORM dịch và thực thi câu lệnh SQL?"
+- **Phương pháp:**
+  - Kết nối đến một container PostgreSQL **thật** và **riêng biệt** (`db-test`) được quản lý bởi Docker Compose.
+  - Sử dụng `TestMain` và các hàm benchmark helper để **setup và dọn dẹp dữ liệu mẫu (seed data)** một cách an toàn, đảm bảo môi trường benchmark luôn sạch sẽ và nhất quán.
+  - Cung cấp một cái nhìn thực tế về hiệu năng của các câu query và chi phí I/O.
 
-### Về việc Kiểm thử Tầng Handler
+### Cách đọc kết quả
 
-Tầng Handler trong kiến trúc này được thiết kế để **mỏng nhất có thể**. Trách nhiệm chính của nó chỉ bao gồm:
+Output sẽ có dạng:
+`BenchmarkAuthService_Login_Unit-8 13479 87882 ns/op 375 B/op 10 allocs/op`
 
-1.  Đọc và xác thực dữ liệu đầu vào (binding DTO).
-2.  Gọi phương thức tương ứng ở tầng Service.
-3.  Chuyển đổi kết quả (dữ liệu hoặc lỗi) từ Service thành một HTTP response thích hợp.
+- `13479`: Số lần vòng lặp đã chạy.
+- `87882 ns/op`: **Thời gian trung bình** cho một lần thực thi (~87 microsecond).
+- `375 B/op`: **Số byte bộ nhớ** được cấp phát mỗi lần chạy.
+- `10 allocs/op`: **Số lần cấp phát bộ nhớ** mỗi lần chạy.
 
-Với bộ unit test toàn diện cho tầng Service, việc viết các bài test tích hợp đầy đủ cho tầng Handler có thể dẫn đến sự trùng lặp trong việc kiểm tra logic nghiệp vụ. Do đó, chiến lược của dự án là tập trung nguồn lực vào việc đảm bảo tầng Service - nơi chứa đựng bộ não của ứng dụng - hoạt động một cách hoàn hảo.
-
-### Cách chạy bộ Unit Test
-
-Các bài test này không yêu cầu bất kỳ phụ thuộc bên ngoài nào (như database) phải đang chạy.
-
-```bash
-# Chạy tất cả các unit test cho tầng service
-go test -v ./internal/service/...
-```
-
-Để thực thi tất cả các file test có trong dự án, bạn có thể chạy từ thư mục gốc:
-
-```bash
-go test -v ./...
-```
+Bằng cách thường xuyên chạy và phân tích các kết quả này, chúng ta có thể tự tin đưa ra các quyết định tối ưu hóa dựa trên dữ liệu thực tế, đảm bảo ứng dụng luôn duy trì hiệu năng cao khi phát triển và mở rộng.

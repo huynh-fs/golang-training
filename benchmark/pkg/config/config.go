@@ -2,10 +2,10 @@ package config
 
 import (
 	"fmt"
-	"log"
+	// "log"
 	"os"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -26,10 +26,10 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("Warning: .env file not found, loading config from OS environment variables")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Println("Warning: .env file not found, loading config from OS environment variables")
+	// }
 
 	cfg := &Config{
 		DBHost:     os.Getenv("DB_HOST"),
