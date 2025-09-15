@@ -27,5 +27,5 @@ Mỗi thư mục đại diện cho một chủ đề (task) cụ thể, kèm the
 20. [Middleware](./middleware/README.md)
 21. [JWT authentication](./jwt-authentication/README.md)
 22. [Unit Test](./unit-test/README.md)
-23. [Mock](.mock/README.md)
-24. [Benchmark](.benchmark/README.md)
+23. [Mock](./mock/README.md)
+24. [Benchmark](./benchmark/README.md)
